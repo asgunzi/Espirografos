@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="pt-br" xml:lang="pt-br">
+ <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+</meta>
+
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+
+    <head>
+        <title>Esferógrafos</title>
+	    <script src="https://d3js.org/d3.v5.min.js"></script>
+    </head>
+    <style>
+		th, td {
+		    text-align: left;		    
+		}
+	</style>
+
+    <body>
+	
+	<table style = "width:50%">
+  	<tr>
+    <th>	<a href="https://ideiasesquecidas.com"><img src="https://ideiasesquecidas.files.wordpress.com/2020/04/forgottenlogo.jpg"width="100" height="50" class = "center"> </a>	
+    </th>
+    <th> Demonstração de curvas de Espirógrafos. Escrito em D3. Teoria <a href="https://ferramentasexcelvba.wordpress.com/2018/09/02/mil-cardioides-no-excel/">aqui</a> </th>
+    </tr>
+	
+
+	
+	
+	<table style = "width:70%">
+  	<tr>
+    <th>N. Voltas:</th>
+    <th>Raio menor:</th>
+	<th>Posição furo:</th>
+    </tr>
+    <tr>
+    <td>
+    <form>
+		  <select onchange = "Desenha()" name="Nvoltas" id="SelectPontos">
+		    <option value="1">1</option>
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			<option value="5">5</option>
+		    <option value="10" selected>10</option>
+		    <option value="15">15</option>
+		    <option value="20">20</option>
+			<option value="50">50</option>
+		  </select>
+		  <br><br>
+		</form>
+		</td>
+    
+    <td>	   
+	<form>
+		  <select onchange = "Desenha()" id="RaioMenor">
+		    <option value="10">10</option>
+			<option value="20">20</option>
+		    <option value="30">30</option>
+		    <option value="50" selected>50</option>
+		    <option value="60">60</option>
+			<option value="75">75</option>
+		    <option value="100">100</option>
+			<option value="125">125</option>
+		    <option value="150">150</option>
+			<option value="175">175</option>
+		    <option value="190">190</option>
+			<option value="210">210</option>
+		  </select>
+		  <br><br>
+		</form>
+	</td>
+	 <td>	   
+	<form>
+		  <select onchange = "Desenha()" id="PosicaoFuro">
+		  		    <option value="8">8</option>
+			<option value="18">18</option>
+		    <option value="28">28</option>
+		    <option value="48" selected>48</option>
+		    <option value="58">58</option>
+			<option value="73">73</option>
+		    <option value="98">98</option>
+			<option value="123">123</option>
+		    <option value="148">148</option>
+			<option value="173">173</option>
+		    <option value="188">188</option>
+			<option value="208">208</option>
+			
+
+		  </select>
+		  <br><br>
+		</form>
+	</td>
+	  </tr>
+	</table>
+	       
+		   
+		   
+        <script type = "text/javascript">
+
+        var svg = d3.select("body").append("svg");
+
+        var limX = 600;
+        var limY = 600;
+        
+        //Define dimensions of svg
+        svg.attr("width", limX)
+        .attr("height",limY);
+
+	function Desenha()
+        {        
+        //Clear svg
+		svg.selectAll("*").remove();
+
+        //dados e definicoes macro
+        var Nvoltas = parseInt(d3.select("#SelectPontos").property("value"));
+	
+
+		var cx0 = 300;
+		var cy0 = 300;
+		var pi = 3.14159265;
+		 
+		var R = 200;
+		var r2 = parseInt(d3.select("#RaioMenor").property("value"));;
+		var r3 = parseInt(d3.select("#PosicaoFuro").property("value"));;;
+		var lambda =45*pi/180;
+		
+		var i = 0;
+		var j = 0;
+		var angulo = 0;
+		
+        //Traça SVG
+		var theta;
+		var Nshapes = 200;
+		var cx1 =[];
+		var cy1 = [];
+		var c=0;
+        //Cria o array de dados
+        for (i = 0; i< Nvoltas; i++)
+        {
+			for (j = 0; j<Nshapes;j++)
+			{
+				//angulo += pi * 2 / Nshapes;
+				c =c+1
+				angulo = pi * 2*c / Nshapes;
+				cx1.push(cx0 + (R-r2)*Math.sin(angulo)-r3*Math.sin(angulo*R/r2 - lambda));
+				cy1.push(cy0 - (R-r2)*Math.cos(angulo)-r3*Math.cos(angulo*R/r2 - lambda));
+				//vetorG.push("rgb(" + corR + "," + parseInt(j/(Nvoltas)*100) + "," + corB + ")");				
+			}
+        }
+
+
+		<!-- //Cria as formas -->		
+        var line1 = svg.selectAll("line")
+        	.data(cx1)
+        	.enter()
+        	.append("line");
+
+        line1.attr("x1", function(d,i){
+        			return cx1[i];
+        		})
+        		.attr("y1", function(d,i){
+        			return cy1[i];
+        		})
+        		.attr("x2", function(d,i){
+					if (i ==Nvoltas*Nshapes-1)
+					{
+						return cx1[i];
+					}
+					else
+					{
+						return cx1[i+1];
+					}
+        		})
+        		.attr("y2", function(d,i){
+					if (i ==Nvoltas*Nshapes-1)
+					{
+						return cy1[i];
+					}
+					else
+					{
+						return cy1[i+1];
+					}
+        		})
+        		.attr("stroke","rgb(" + 255 + "," + 0 + "," + 255 + ")")
+        		.attr("stroke-width","1")
+        		;
+        }
+		
+		Desenha()
+		</script>
+
+    </body>
+</html>
